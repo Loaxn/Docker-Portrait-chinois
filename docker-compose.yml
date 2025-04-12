@@ -1,17 +1,15 @@
-version: "3.8"
-
 services:
   app_frontend:
-    build: ./app/frontend
+    build: ./app/frontend  # Indique le chemin de ton dossier frontend
     container_name: app_frontend
     restart: always
     ports:
-      - "3000:80"
+      - "3000:80"  # Frontend accessible sur localhost:3000
     depends_on:
       - app_db
 
   app_db:
-    image: mysql
+    image: mysql:5.7  # Utilise une image stable de MySQL
     container_name: app_db
     restart: always
     environment:
@@ -22,5 +20,42 @@ services:
     volumes:
       - app_db_data:/var/lib/mysql
 
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - "8080:80"  # Nextcloud accessible sur localhost:8080
+    environment:
+      - MYSQL_PASSWORD=${APP_DB_PASSWORD}
+      - MYSQL_DATABASE=vanilladb
+      - MYSQL_USER=vanilla
+      - MYSQL_HOST=app_db
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      - app_db
+
+  onlyoffice:
+    image: onlyoffice/documentserver
+    container_name: onlyoffice
+    restart: always
+    ports:
+      - "8081:80"  # OnlyOffice accessible sur localhost:8081
+    environment:
+      - ONLYOFFICE_SECRET=${ONLYOFFICE_SECRET}
+    depends_on:
+      - nextcloud
+
+  portrait_chinois:
+    build: ./app/frontend  # Remarque : pointer vers le répertoire contenant le Dockerfile
+    container_name: portrait_chinois
+    restart: always
+    ports:
+      - "8083:80"  # Portrait Chinois accessible sur localhost:8083
+    depends_on:
+      - app_db
+
 volumes:
   app_db_data:
+  nextcloud_data:
