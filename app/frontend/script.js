@@ -1,0 +1,1 @@
+console.log('App statique en JS ready 🚀');

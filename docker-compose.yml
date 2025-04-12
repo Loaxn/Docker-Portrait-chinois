@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  app_frontend:
+    build: ./app/frontend
+    container_name: app_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - app_db
+
+  app_db:
+    image: mysql
+    container_name: app_db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${APP_DB_PASSWORD}
+      - MYSQL_DATABASE=vanilladb
+      - MYSQL_USER=vanilla
+      - MYSQL_PASSWORD=${APP_DB_PASSWORD}
+    volumes:
+      - app_db_data:/var/lib/mysql
+
+volumes:
+  app_db_data:
